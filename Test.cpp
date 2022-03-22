@@ -4,6 +4,14 @@
 using namespace ariel;
 
 #include <string>
+#include <algorithm>
+
+std::string nospaces(std::string input) {
+	std::erase(input, '\t');
+	std::erase(input, '\n');
+	std::erase(input, '\r');
+	return input;
+}
 
 TEST_CASE("Bad input") {
     ariel::Notebook notebook;
@@ -47,8 +55,17 @@ TEST_CASE("Good input") {
     SUBCASE("Vertical") {
         const std::string writeTestString = "t\nh\ni\ns\n \ni\ns\n \nt\nh\ne\n \nt\ne\ns\nt";
         const std::string erased3tildes = "~\n~\n~";
-        notebook.write(2, 1, 1, Direction::Vertical, writeTestString);
-        //NEED TO CONTINUE THE TEST TO CHECK THE VERTICAL READING, AND ERASING
+        notebook.write(2, 1, 1, Direction::Vertical, nospaces(writeTestString));
+        const std::string tilde = "~";
+        const std::string t = "t";
+        const std::string h = "h";
+        const std::string i = "i";
+        CHECK(notebook.read(2,1,1,Direction::Vertical, 1) == t);
+        CHECK(notebook.read(2,2,1,Direction::Vertical, 1) == h);
+        notebook.erase(2, 1, 1, Direction::Vertical, 2);
+        CHECK(notebook.read(2,1,1,Direction::Vertical, 1) == tilde);
+        CHECK(notebook.read(2,2,1,Direction::Vertical, 1) == tilde);
+        CHECK(notebook.read(2,3,1,Direction::Vertical, 1) == i);
     }
 
 }
